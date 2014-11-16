@@ -22,7 +22,7 @@
     },
     "autoload": {
 	"psr-0": {
-            "Gossamer\\Caching\\": "src/Gossamer/Caching"
+            "Gossamer\\Caching\\": "src/"
             }
     }
 }
