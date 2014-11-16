@@ -3,7 +3,7 @@
     "type": "library",
     "description": "php caching library",
     "keywords": ["php","caching"],
-    "homepage": "https://github.com/dmeikle/php-caching",
+    "homepage": "https://github.com/dmeikle/gossamerCaching",
     "license": "MIT",
     "authors": [
         {
