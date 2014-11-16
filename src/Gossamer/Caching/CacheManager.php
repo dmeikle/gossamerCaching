@@ -16,7 +16,7 @@ class CacheManager implements CachingInterface{
    
     protected $MAX_FILE_LIFESPAN = 1200;
     
-    protected $MAX_WRITE_TIME_ELAPSED = 5;
+    protected $MAX_WRITE_TIME_ELAPSED = 60;
     
     protected $logger = null;
     
