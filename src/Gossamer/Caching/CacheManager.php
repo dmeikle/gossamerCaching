@@ -59,6 +59,7 @@ class CacheManager implements CachingInterface{
         }
         
         try{
+            $this->verifyPathExists(__CACHE_DIRECTORY);
             //first save current cache to dogpile file
             $this->createDogpileFile($key);
             $this->logger->addDebug('Caching - saving values to cache file');
@@ -77,6 +78,13 @@ class CacheManager implements CachingInterface{
         return true;
     }
 
+    protected function verifyPathExists($path) {
+        if(file_exists($path)) {
+            return;
+        }
+        $this->mkdir($path);
+    }
+    
     protected function createDogpileFile($key) {
         $this->logger->addDebug('Caching - creating shunt for dogpile condition');
         if(!file_exists(__CACHE_DIRECTORY . "$key.cache")) {
