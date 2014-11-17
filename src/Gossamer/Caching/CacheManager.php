@@ -154,7 +154,7 @@ class CacheManager implements CachingInterface{
     public function copy($originFile, $targetFile, $override = false)
     {
         if (stream_is_local($originFile) && !is_file($originFile)) {
-            throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);
+            throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null);
         }
 
         $this->mkdir(dirname($targetFile));
@@ -176,7 +176,7 @@ class CacheManager implements CachingInterface{
             unset($source, $target);
 
             if (!is_file($targetFile)) {
-                throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
+                throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null);
             }
         }
     }
@@ -202,9 +202,9 @@ class CacheManager implements CachingInterface{
                 if (!is_dir($dir)) {
                     // The directory was not created by a concurrent process. Let's throw an exception with a developer friendly error message if we have one
                     if ($error) {
-                        throw new IOException(sprintf('Failed to create "%s": %s.', $dir, $error['message']), 0, null, $dir);
+                        throw new IOException(sprintf('Failed to create "%s": %s.', $dir, $error['message']), 0, null);
                     }
-                    throw new IOException(sprintf('Failed to create "%s"', $dir), 0, null, $dir);
+                    throw new IOException(sprintf('Failed to create "%s"', $dir), 0, null);
                 }
             }
         }
