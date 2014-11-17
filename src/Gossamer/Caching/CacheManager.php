@@ -5,7 +5,8 @@ namespace Gossamer\Caching;
 
 use Gossamer\Caching\CachingInterface;
 use Monolog\Logger;
-
+use Gossamer\Caching\Exceptions\FileNotFoundException;
+use Gossamer\Caching\Exceptions\IOException;
 
 /**
  * Description of CacheManager
