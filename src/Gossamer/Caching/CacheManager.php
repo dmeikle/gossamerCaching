@@ -1,12 +1,12 @@
 <?php
 
-namespace Gossamer\Caching;
+namespace Gossamer\DBFramework\Caching;
 
 
-use Gossamer\Caching\CachingInterface;
+use Gossamer\DBFramework\Caching\CachingInterface;
 use Monolog\Logger;
-use Gossamer\Caching\Exceptions\FileNotFoundException;
-use Gossamer\Caching\Exceptions\IOException;
+use Gossamer\DBFramework\Caching\Exceptions\FileNotFoundException;
+use Gossamer\DBFramework\Caching\Exceptions\IOException;
 
 /**
  * Description of CacheManager

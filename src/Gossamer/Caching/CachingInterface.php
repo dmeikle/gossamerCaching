@@ -2,7 +2,7 @@
 
 
 
-namespace Gossamer\Caching;
+namespace Gossamer\DBFramework\Caching;
 
 /**
  *

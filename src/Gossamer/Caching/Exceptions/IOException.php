@@ -1,6 +1,6 @@
 <?php
 
-namespace Gossamer\Caching\Exceptions;
+namespace Gossamer\DBFramework\Caching\Exceptions;
 
 /**
  * Description of IOException
