@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Gossamer\DBFramework\Caching\Exceptions;
+namespace Gossamer\Caching\Exceptions;
 
 /**
  * Description of FileNotFoundException

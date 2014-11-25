@@ -1,8 +1,8 @@
 <?php
 
-namespace test\Gossamer\DBFramework\Caching;
+namespace test\Gossamer\Caching;
 
-use Gossamer\DBFramework\Caching\CacheManager;
+use Gossamer\Caching\CacheManager;
 use tests\BaseTest;
 
 
