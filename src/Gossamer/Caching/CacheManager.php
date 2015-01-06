@@ -21,7 +21,7 @@ class CacheManager implements CachingInterface{
     
     protected $logger = null;
     
-    public function __construct(Logger $logger, array $params = null) {
+    public function __construct(Logger $logger = null, array $params = null) {
         $this->logger = $logger;
         if(!is_null($params)) {
             if(array_key_exists('MAX_FILE_LIFESPAN', $params)) {
@@ -75,10 +75,15 @@ class CacheManager implements CachingInterface{
             $this->verifyPathExists(__CACHE_DIRECTORY);
             //first save current cache to dogpile file
             $this->createDogpileFile($key);
-            $this->logger->addDebug('Caching - saving values to cache file');
+            if(!is_null($this->logger)) {
+                $this->logger->addDebug('Caching - saving values to cache file');
+            }
+            
             $file = fopen(__CACHE_DIRECTORY . "$key.cache", "w") or die("Unable to open file!");
         }  catch (\Exception $e) {
-            $this->logger->addError($e->getMessage());
+            if(!is_null($this->logger)) {
+                $this->logger->addError($e->getMessage());
+            }            
            
             return false;
         }
@@ -100,7 +105,10 @@ class CacheManager implements CachingInterface{
     }
     
     protected function createDogpileFile($key) {
-        $this->logger->addDebug('Caching - creating shunt for dogpile condition');
+        if(!is_null($this->logger)) {
+            $this->logger->addDebug('Caching - creating shunt for dogpile condition');    
+        }
+        
         if(!file_exists(__CACHE_DIRECTORY . "$key.cache")) {
             touch(__CACHE_DIRECTORY . "$key.cache.dogpile");
             
@@ -111,14 +119,23 @@ class CacheManager implements CachingInterface{
     }
     
     protected function deleteDogpileFile($key) {
-        $this->logger->addDebug('Caching - deleting shunt for dogpile condition');
+        if(!is_null($this->logger)) {
+           $this->logger->addDebug('Caching - deleting shunt for dogpile condition');     
+        }
+        
         unlink(__CACHE_DIRECTORY . "$key.cache.dogpile");
     }
     
     protected function inDogpileMode($key) {
-        $this->logger->addDebug('Caching - checking for dogpile condition');
+        if(!is_null($this->logger)) {
+           $this->logger->addDebug('Caching - checking for dogpile condition');     
+        }
+        
         if(file_exists(__CACHE_DIRECTORY . "$key.cache.dogpile")) {
-            $this->logger->addDebug('Caching - currently in dogpile condition');            
+            if(!is_null($this->logger)) {
+                $this->logger->addDebug('Caching - currently in dogpile condition');  
+            }
+                      
         }
         
         return file_exists(__CACHE_DIRECTORY . "$key.cache.dogpile");
@@ -126,7 +143,10 @@ class CacheManager implements CachingInterface{
     
     
     private function formatValuesBeforeSaving($values) {
-        $this->logger->addDebug('Caching - formatting values before saving');
+        if(!is_null($this->logger)) {
+            $this->logger->addDebug('Caching - formatting values before saving');     
+        }
+        
         
         if(is_array($values)) {
             return "<?php\r\n"
@@ -137,7 +157,10 @@ class CacheManager implements CachingInterface{
     }
     
     private function parseArray(array $values) {
-        $this->logger->addDebug('Caching - parsing array values');
+        if(!is_null($this->logger)) {
+            $this->logger->addDebug('Caching - parsing array values');
+        }
+        
         $retval = "array (";
         $elements = '';
         foreach($values as $key => $row) {
