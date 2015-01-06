@@ -30,6 +30,19 @@ class CacheManager implements CachingInterface{
         }
     }
     
+    /**
+     * since some cached values need to be re-cached if the database updates
+     * this method can be called from a save routine's post save 
+     * event handling
+     * 
+     * @param string $key - the file to remove
+     */
+    public function invalidateCache($key) {
+        if(file_exists(__CACHE_DIRECTORY . "$key.cache")) {            
+            unlink(__CACHE_DIRECTORY . "$key.cache");          
+        }
+    }
+    
     public function retrieveFromCache($key) {
       if(file_exists(__CACHE_DIRECTORY . "$key.cache") && $this->isNotStale(__CACHE_DIRECTORY . "$key.cache", $this->MAX_FILE_LIFESPAN)) {
             
@@ -82,6 +95,7 @@ class CacheManager implements CachingInterface{
         if(file_exists($path)) {
             return;
         }
+        
         $this->mkdir($path);
     }
     
@@ -92,6 +106,7 @@ class CacheManager implements CachingInterface{
             
             return;
         }
+        
         $this->copy(__CACHE_DIRECTORY . "$key.cache", __CACHE_DIRECTORY . "$key.cache.dogpile");
     }
     
