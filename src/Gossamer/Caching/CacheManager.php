@@ -44,9 +44,12 @@ class CacheManager implements CachingInterface{
     }
     
     public function retrieveFromCache($key) {
-      if(file_exists(__CACHE_DIRECTORY . "$key.cache") && $this->isNotStale(__CACHE_DIRECTORY . "$key.cache", $this->MAX_FILE_LIFESPAN)) {
+        //in case the developer has added a subfolder, we need to know this
+        $path = $this->buildCompletePath(__CACHE_DIRECTORY, $key);
+        $key = $this->parseKey($key);
+      if(file_exists($path . "$key.cache") && $this->isNotStale($path . "$key.cache", $this->MAX_FILE_LIFESPAN)) {
             
-            $loadedValues = include __CACHE_DIRECTORY . "$key.cache";
+            $loadedValues = include $path . "$key.cache";
             return $loadedValues;            
         }
         
@@ -60,29 +63,54 @@ class CacheManager implements CachingInterface{
         return ($currentTime - $filetime) < $decayTime;
     }
 
+    private function buildCompletePath($path, $key) {
+        $pieces = explode(DIRECTORY_SEPARATOR, $key);
+        if(count($pieces) == 1){
+            return $path;
+        }
+        
+        array_pop($pieces);
+        
+        return $path . implode(DIRECTORY_SEPARATOR, $pieces) . DIRECTORY_SEPARATOR;        
+    }
     
+    private function parseKey($key) {
+        $pieces = explode(DIRECTORY_SEPARATOR, $key);
+        if(count($pieces) == 1){
+            return $key;
+        }
+                
+        
+        return array_pop($pieces); 
+    }
     public function saveToCache($key, $values) {
+        //in case the developer has added a subfolder, we need to know this
+        $path = $this->buildCompletePath(__CACHE_DIRECTORY, $key);
+        $key = $this->parseKey($key);
+        
         if($this->inDogpileMode($key)) {
             //check to see if we're in a stale write condition
-            if($this->isNotStale(__CACHE_DIRECTORY . "$key.cache.dogpile", $this->MAX_WRITE_TIME_ELAPSED)) {
+            if($this->isNotStale($path . "$key.cache.dogpile", $this->MAX_WRITE_TIME_ELAPSED)) {
                 //someone is already writing to the file so we cannot cache right now
                 return;
             }
             //seems to be stale - shouldn't have taken this long to create
         }
-        
+
         try{
-            $this->verifyPathExists(__CACHE_DIRECTORY);
+            $this->verifyPathExists($path);
+    
             //first save current cache to dogpile file
             $this->createDogpileFile($key);
+   
             if(!is_null($this->logger)) {
-                $this->logger->addDebug('Caching - saving values to cache file');
+                //$this->logger->addDebug('Caching - saving values to cache file');
             }
             
-            $file = fopen(__CACHE_DIRECTORY . "$key.cache", "w") or die("Unable to open file!");
+            $file = fopen($path . "$key.cache", "w") or die("Unable to open file!");
         }  catch (\Exception $e) {
             if(!is_null($this->logger)) {
-                $this->logger->addError($e->getMessage());
+               // $this->logger->addError($e->getMessage());
             }            
            
             return false;
@@ -90,6 +118,7 @@ class CacheManager implements CachingInterface{
         
         fwrite($file, $this->formatValuesBeforeSaving($values));
         fclose($file);
+        
         
         $this->deleteDogpileFile($key);
         
@@ -106,7 +135,7 @@ class CacheManager implements CachingInterface{
     
     protected function createDogpileFile($key) {
         if(!is_null($this->logger)) {
-            $this->logger->addDebug('Caching - creating shunt for dogpile condition');    
+           // $this->logger->addDebug('Caching - creating shunt for dogpile condition');    
         }
         
         if(!file_exists(__CACHE_DIRECTORY . "$key.cache")) {
@@ -120,7 +149,7 @@ class CacheManager implements CachingInterface{
     
     protected function deleteDogpileFile($key) {
         if(!is_null($this->logger)) {
-           $this->logger->addDebug('Caching - deleting shunt for dogpile condition');     
+          // $this->logger->addDebug('Caching - deleting shunt for dogpile condition');     
         }
         
         unlink(__CACHE_DIRECTORY . "$key.cache.dogpile");
@@ -128,12 +157,12 @@ class CacheManager implements CachingInterface{
     
     protected function inDogpileMode($key) {
         if(!is_null($this->logger)) {
-           $this->logger->addDebug('Caching - checking for dogpile condition');     
+           //$this->logger->addDebug('Caching - checking for dogpile condition');     
         }
         
         if(file_exists(__CACHE_DIRECTORY . "$key.cache.dogpile")) {
             if(!is_null($this->logger)) {
-                $this->logger->addDebug('Caching - currently in dogpile condition');  
+               // $this->logger->addDebug('Caching - currently in dogpile condition');  
             }
                       
         }
@@ -144,7 +173,7 @@ class CacheManager implements CachingInterface{
     
     private function formatValuesBeforeSaving($values) {
         if(!is_null($this->logger)) {
-            $this->logger->addDebug('Caching - formatting values before saving');     
+            //$this->logger->addDebug('Caching - formatting values before saving');     
         }
         
         
@@ -158,7 +187,7 @@ class CacheManager implements CachingInterface{
     
     private function parseArray(array $values) {
         if(!is_null($this->logger)) {
-            $this->logger->addDebug('Caching - parsing array values');
+           // $this->logger->addDebug('Caching - parsing array values');
         }
         
         $retval = "array (";

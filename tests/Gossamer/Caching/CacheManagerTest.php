@@ -32,4 +32,13 @@ class CacheManagerTest extends BaseTest{
         $this->assertTrue(array_key_exists('marco', $result));
         $this->assertEquals($result['marco'], 'polo');
     }
+    
+    public function testBuildpath() {
+        $params = array('MAX_FILE_LIFESPAN' => 10); //10 seconds
+        $mgr = new CacheManager($this->getLogger());
+        
+        $result = $mgr->saveToCache('/subfolder/testing', array('marco' => 'polo'));
+        $this->assertTrue($result); 
+         
+    }
 }
