@@ -43,14 +43,19 @@ class CacheManager implements CachingInterface{
         }
     }
     
-    public function retrieveFromCache($key) {
+    public function retrieveFromCache($key, $static = false) {
         //in case the developer has added a subfolder, we need to know this
         $path = $this->buildCompletePath(__CACHE_DIRECTORY, $key);
         $key = $this->parseKey($key);
-      if(file_exists($path . "$key.cache") && $this->isNotStale($path . "$key.cache", $this->MAX_FILE_LIFESPAN)) {
+        
+        if(file_exists($path . "$key.cache") && $this->isNotStale($path . "$key.cache", $this->MAX_FILE_LIFESPAN)) {
+            if(!$static) {
+                $loadedValues = include $path . "$key.cache";
+                
+                return $loadedValues; 
+            }
             
-            $loadedValues = include $path . "$key.cache";
-            return $loadedValues;            
+            return file_get_contents($path . "$key.cache");
         }
         
         return false;
@@ -83,7 +88,8 @@ class CacheManager implements CachingInterface{
         
         return array_pop($pieces); 
     }
-    public function saveToCache($key, $values) {
+    
+    public function saveToCache($key, $values, $static = false) {
         //in case the developer has added a subfolder, we need to know this
         $path = $this->buildCompletePath(__CACHE_DIRECTORY, $key);
         $key = $this->parseKey($key);
@@ -116,9 +122,13 @@ class CacheManager implements CachingInterface{
             return false;
         }
         
-        fwrite($file, $this->formatValuesBeforeSaving($values));
-        fclose($file);
+        if($static) {
+            fwrite($file, $values);
+        } else {
+            fwrite($file, $this->formatValuesBeforeSaving($values));
+        }
         
+        fclose($file);        
         
         $this->deleteDogpileFile($key);
         

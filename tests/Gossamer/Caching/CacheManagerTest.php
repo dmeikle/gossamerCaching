@@ -33,12 +33,37 @@ class CacheManagerTest extends BaseTest{
         $this->assertEquals($result['marco'], 'polo');
     }
     
-    public function testBuildpath() {
+    public function testHTMLSaveToCache() {
+        $params = array('MAX_FILE_LIFESPAN' => 10); //10 seconds
+        $mgr = new CacheManager($this->getLogger());
+        
+        $result = $mgr->saveToCache('html', '<div id="test">this is a test</div>',true);
+        $this->assertTrue($result);        
+    }
+    
+    public function testHTMLRetrieveFromCache() {
+        
+        $params = array('MAX_FILE_LIFESPAN' => 10); //10 seconds
+        $mgr = new CacheManager($this->getLogger());
+        
+        $result = $mgr->retrieveFromCache('html', true);
+       
+        $this->assertEquals($result, '<div id="test">this is a test</div>');
+    }
+    
+    public function testSaveToCacheSubfolder() {
         $params = array('MAX_FILE_LIFESPAN' => 10); //10 seconds
         $mgr = new CacheManager($this->getLogger());
         
         $result = $mgr->saveToCache('/subfolder/testing', array('marco' => 'polo'));
-        $this->assertTrue($result); 
-         
+        $this->assertTrue($result);          
+    }
+    public function testRetrieveFromCacheSubfolder() {
+        $params = array('MAX_FILE_LIFESPAN' => 10); //10 seconds
+        $mgr = new CacheManager($this->getLogger());
+        
+        $result = $mgr->retrieveFromCache('/subfolder/testing');
+        print_r($result);
+       // $this->assertTrue($result);          
     }
 }
