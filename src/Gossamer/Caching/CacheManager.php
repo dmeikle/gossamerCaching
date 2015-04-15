@@ -113,7 +113,7 @@ class CacheManager implements CachingInterface{
                 //$this->logger->addDebug('Caching - saving values to cache file');
             }
             
-            $file = fopen($path . "$key.cache", "w") or die("Unable to open file!");
+            $file = @fopen($path . "$key.cache", "w") or die("Unable to open file!");
         }  catch (\Exception $e) {
             if(!is_null($this->logger)) {
                // $this->logger->addError($e->getMessage());
@@ -123,9 +123,9 @@ class CacheManager implements CachingInterface{
         }
         
         if($static) {
-            fwrite($file, $values);
+            @fwrite($file, $values);
         } else {
-            fwrite($file, $this->formatValuesBeforeSaving($values));
+            @fwrite($file, $this->formatValuesBeforeSaving($values));
         }
         
         fclose($file);        
@@ -247,7 +247,7 @@ class CacheManager implements CachingInterface{
             $source = fopen($originFile, 'r');
             // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
             $target = fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))));
-            stream_copy_to_stream($source, $target);
+            @stream_copy_to_stream($source, $target);
             fclose($source);
             fclose($target);
             unset($source, $target);
