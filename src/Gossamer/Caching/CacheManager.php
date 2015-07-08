@@ -21,6 +21,10 @@ class CacheManager implements CachingInterface{
     
     protected $logger = null;
     
+    const LOAD_STATIC_FILE = true;
+    
+    const LOAD_PHP_FILE = false;
+    
     public function __construct(Logger $logger = null, array $params = null) {
         $this->logger = $logger;
         if(!is_null($params)) {
