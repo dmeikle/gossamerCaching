@@ -117,7 +117,7 @@ class CacheManager implements CachingInterface{
                 //$this->logger->addDebug('Caching - saving values to cache file');
             }
             
-            $file = fopen($path . "$key.cache", "w") or die("Unable to open file!");
+            $file = fopen($path . "$key.cache", "w") or die("Unable to write to cache file!");
         }  catch (\Exception $e) {
             if(!is_null($this->logger)) {
                // $this->logger->addError($e->getMessage());
