@@ -98,7 +98,9 @@ class CacheManager implements CachingInterface{
      * @param string $key
      */
     public function deleteCache($key) {
-         unlink(__CACHE_DIRECTORY . "$key.cache");
+        if(file_exists(__CACHE_DIRECTORY . "$key.cache")) {
+            unlink(__CACHE_DIRECTORY . "$key.cache");
+        }
     }
     
     public function saveToCache($key, $values, $static = false) {
