@@ -93,6 +93,14 @@ class CacheManager implements CachingInterface{
         return array_pop($pieces); 
     }
     
+    /**
+     * 
+     * @param string $key
+     */
+    public function deleteCache($key) {
+         unlink(__CACHE_DIRECTORY . "$key.cache");
+    }
+    
     public function saveToCache($key, $values, $static = false) {
         //in case the developer has added a subfolder, we need to know this
         $path = $this->buildCompletePath(__CACHE_DIRECTORY, $key);

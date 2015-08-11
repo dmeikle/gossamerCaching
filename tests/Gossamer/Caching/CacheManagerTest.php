@@ -63,7 +63,17 @@ class CacheManagerTest extends BaseTest{
         $mgr = new CacheManager($this->getLogger());
         
         $result = $mgr->retrieveFromCache('/subfolder/testing');
-        print_r($result);
-       // $this->assertTrue($result);          
+       
+        $this->assertTrue(array_key_exists('marco', $result));
+        $this->assertEquals($result['marco'], 'polo'); 
+    }
+    
+    public function testDeleteCache() {
+        $params = array('MAX_FILE_LIFESPAN' => 10); //10 seconds
+        $mgr = new CacheManager($this->getLogger());
+        
+        $result = $mgr->saveToCache('/subfolder/testing', array('marco' => 'polo'));
+        
+        $mgr->deleteCache('/subfolder/testing');
     }
 }
