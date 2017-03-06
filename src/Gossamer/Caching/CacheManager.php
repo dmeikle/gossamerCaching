@@ -3,6 +3,7 @@
 namespace Gossamer\Caching;
 
 use Gossamer\Caching\CachingInterface;
+use Gossamer\Horus\Http\HttpInterface;
 use Monolog\Logger;
 use Gossamer\Caching\Exceptions\FileNotFoundException;
 use Gossamer\Caching\Exceptions\IOException;
@@ -12,11 +13,13 @@ use Gossamer\Caching\Exceptions\IOException;
  *
  * @author Dave Meikle
  */
-class CacheManager implements CachingInterface {
+class CacheManager implements CachingInterface
+{
 
     protected $MAX_FILE_LIFESPAN = 1200;
     protected $MAX_WRITE_TIME_ELAPSED = 60;
     protected $logger = null;
+    protected $request;
 
     const LOAD_STATIC_FILE = true;
     const LOAD_PHP_FILE = false;
@@ -30,6 +33,21 @@ class CacheManager implements CachingInterface {
         }
     }
 
+    public function setHttpRequest(HttpInterface $request) {
+        $this->request = $request;
+    }
+
+    private function getCacheDirectory() {
+        if (defined('__CACHE_DIRECTORY')) {
+            return __CACHE_DIRECTORY;
+        }
+
+        if(!is_null($this->request)) {
+            return $this->request->getSiteParams()->getDebugOutputPath();
+        }
+    }
+
+
     /**
      * since some cached values need to be re-cached if the database updates
      * this method can be called from a save routine's post save
@@ -38,8 +56,8 @@ class CacheManager implements CachingInterface {
      * @param string $key - the file to remove
      */
     public function invalidateCache($key) {
-        if (file_exists(__CACHE_DIRECTORY . "$key.cache")) {
-            unlink(__CACHE_DIRECTORY . "$key.cache");
+        if (file_exists($this->getCacheDirectory() . "$key.cache")) {
+            unlink($this->getCacheDirectory() . "$key.cache");
         }
     }
 
@@ -53,7 +71,7 @@ class CacheManager implements CachingInterface {
      */
     public function retrieveFromCache($key, $static = false) {
         //in case the developer has added a subfolder, we need to know this
-        $path = $this->buildCompletePath(__CACHE_DIRECTORY, $key);
+        $path = $this->buildCompletePath($this->getCacheDirectory(), $key);
         $key = $this->parseKey($key);
 
         if (file_exists($path . "$key.cache") && $this->isNotStale($path . "$key.cache", $this->MAX_FILE_LIFESPAN)) {
@@ -126,8 +144,8 @@ class CacheManager implements CachingInterface {
      * @param string $key
      */
     public function deleteCache($key) {
-        if (file_exists(__CACHE_DIRECTORY . "$key.cache")) {
-            unlink(__CACHE_DIRECTORY . "$key.cache");
+        if (file_exists($this->getCacheDirectory() . "$key.cache")) {
+            unlink($this->getCacheDirectory() . "$key.cache");
         }
     }
 
@@ -142,7 +160,7 @@ class CacheManager implements CachingInterface {
      */
     public function saveToCache($key, $values, $static = false) {
         //in case the developer has added a subfolder, we need to know this
-        $path = $this->buildCompletePath(__CACHE_DIRECTORY, $key);
+        $path = $this->buildCompletePath($this->getCacheDirectory(), $key);
         $key = $this->parseKey($key);
 
         if ($this->inDogpileMode($key)) {
@@ -214,13 +232,13 @@ class CacheManager implements CachingInterface {
             // $this->logger->addDebug('Caching - creating shunt for dogpile condition');
         }
 
-        if (!file_exists(__CACHE_DIRECTORY . "$key.cache")) {
-            touch(__CACHE_DIRECTORY . "$key.cache.dogpile");
+        if (!file_exists($this->getCacheDirectory() . "$key.cache")) {
+            touch($this->getCacheDirectory() . "$key.cache.dogpile");
 
             return;
         }
 
-        $this->copy(__CACHE_DIRECTORY . "$key.cache", __CACHE_DIRECTORY . "$key.cache.dogpile");
+        $this->copy($this->getCacheDirectory() . "$key.cache", $this->getCacheDirectory() . "$key.cache.dogpile");
     }
 
     /**
@@ -232,8 +250,8 @@ class CacheManager implements CachingInterface {
         if (!is_null($this->logger)) {
             // $this->logger->addDebug('Caching - deleting shunt for dogpile condition');
         }
-        if (file_exists(__CACHE_DIRECTORY . "$key.cache.dogpile")) {
-            unlink(__CACHE_DIRECTORY . "$key.cache.dogpile");
+        if (file_exists($this->getCacheDirectory() . "$key.cache.dogpile")) {
+            unlink($this->getCacheDirectory() . "$key.cache.dogpile");
         }
     }
 
@@ -250,13 +268,13 @@ class CacheManager implements CachingInterface {
             //$this->logger->addDebug('Caching - checking for dogpile condition');
         }
 
-        if (file_exists(__CACHE_DIRECTORY . "$key.cache.dogpile")) {
+        if (file_exists($this->getCacheDirectory() . "$key.cache.dogpile")) {
             if (!is_null($this->logger)) {
                 // $this->logger->addDebug('Caching - currently in dogpile condition');
             }
         }
 
-        return file_exists(__CACHE_DIRECTORY . "$key.cache.dogpile");
+        return file_exists($this->getCacheDirectory() . "$key.cache.dogpile");
     }
 
     /**
@@ -274,7 +292,7 @@ class CacheManager implements CachingInterface {
 
         if (is_array($values)) {
             return "<?php\r\n"
-                    . "return " . $this->parseArray($values) . ";";
+            . "return " . $this->parseArray($values) . ";";
         }
 
         return $values;
@@ -282,7 +300,7 @@ class CacheManager implements CachingInterface {
 
     /**
      * parses each element to make an 'array' into a writable string
-     * 
+     *
      * @param array $values
      *
      * @return string
@@ -313,9 +331,9 @@ class CacheManager implements CachingInterface {
      *
      * By default, if the target already exists, it is not overridden.
      *
-     * @param string  $originFile The original filename
-     * @param string  $targetFile The target filename
-     * @param bool    $override   Whether to override an existing file or not
+     * @param string $originFile The original filename
+     * @param string $targetFile The target filename
+     * @param bool $override Whether to override an existing file or not
      *
      * @throws FileNotFoundException    When originFile doesn't exist
      * @throws IOException              When copy fails
@@ -353,7 +371,7 @@ class CacheManager implements CachingInterface {
      * Creates a directory recursively.
      *
      * @param string|array|\Traversable $dirs The directory path
-     * @param int                       $mode The directory mode
+     * @param int $mode The directory mode
      *
      * @throws IOException On any directory creation failure
      */
