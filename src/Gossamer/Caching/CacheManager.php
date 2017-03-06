@@ -43,8 +43,10 @@ class CacheManager implements CachingInterface
         }
 
         if(!is_null($this->request)) {
-            return $this->request->getSiteParams()->getDebugOutputPath();
+            return $this->request->getSiteParams()->getCacheDirectory();
         }
+
+        throw new \Exception('Cache Directory not configured');
     }
 
 
