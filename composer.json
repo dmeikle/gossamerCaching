@@ -19,7 +19,7 @@
   "minimum-stability": "stable",
   "require": {
     "monolog/monolog": "1.2.*",
-    "gossamer/horus": "dev-master"
+    "gossamer/horus": "1.1.*"
   },
   "require-dev": {
     "phpunit/phpunit": "4.0.*"
