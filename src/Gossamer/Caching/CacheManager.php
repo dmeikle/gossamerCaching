@@ -98,6 +98,9 @@ class CacheManager implements CachingInterface
      * @return boolean
      */
     private function isNotStale($filepath, $decayTime) {
+         if(!file_exists($filepath)) {
+            return false;
+        }
         $filetime = filemtime($filepath);
         $currentTime = time();
 
