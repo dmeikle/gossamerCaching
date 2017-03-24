@@ -3,7 +3,7 @@
 namespace Gossamer\Caching;
 
 use Gossamer\Caching\CachingInterface;
-use Gossamer\Horus\Http\HttpInterface;
+//use Gossamer\Horus\Http\HttpInterface;
 use Monolog\Logger;
 use Gossamer\Caching\Exceptions\FileNotFoundException;
 use Gossamer\Caching\Exceptions\IOException;
@@ -33,7 +33,7 @@ class CacheManager implements CachingInterface
         }
     }
 
-    public function setHttpRequest(HttpInterface $request) {
+    public function setHttpRequest( $request) {
         $this->request = $request;
     }
 

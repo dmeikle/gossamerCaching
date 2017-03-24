@@ -16,7 +16,7 @@
       "role": "Developer"
     }
   ],
-  "minimum-stability": "stable",
+
   "require": {
     "monolog/monolog": "1.2.*",
     "gossamer/horus": "1.1.*"
