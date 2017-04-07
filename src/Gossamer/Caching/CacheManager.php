@@ -256,7 +256,7 @@ class CacheManager implements CachingInterface
             // $this->logger->addDebug('Caching - deleting shunt for dogpile condition');
         }
         if (file_exists($this->getCacheDirectory() . "$key.cache.dogpile")) {
-            unlink($this->getCacheDirectory() . "$key.cache.dogpile");
+            @unlink($this->getCacheDirectory() . "$key.cache.dogpile");
         }
     }
 
